@@ -1,2 +1,2 @@
 # wallpapersBing
-https://github.com/stuhin/wallpapersBing/raw/master/Wallpapers.exe
+https://github.com/stuhin/wallpapersBing/raw/master/Installer/SetupWallpapers.msi
