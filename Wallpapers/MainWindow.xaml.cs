@@ -57,10 +57,11 @@ namespace Wallpapers
             string currentpath = Directory.GetCurrentDirectory();
             Config config = Config.Get();
             List<FileData> fileDatas = new List<FileData>();
-            foreach (string path in Directory.GetFiles($"{currentpath}\\{config.desktop}"))
+            List<FileInfo> fileInfos = Directory.GetFiles($"{currentpath}\\{config.desktop}").Select(p => new FileInfo(p)).OrderByDescending(f => f.CreationTime).Take(10).ToList();
+
+            foreach (FileInfo file in fileInfos)
             {
-                FileInfo file = new FileInfo(path);
-                fileDatas.Add(new FileData() { Image = toBitmap(File.ReadAllBytes(path)), Path = path, Created = file.CreationTime });
+                fileDatas.Add(new FileData() { Image = toBitmap(file.FullName), Path = file.FullName, Created = file.CreationTime });
             }
 
             if (fileDatas.Count > 0)
@@ -68,19 +69,21 @@ namespace Wallpapers
                 Wallpaper.Set(fileDatas.OrderByDescending(f => f.Created).First().Path);
             }
 
-            dataGrid.ItemsSource = fileDatas.OrderByDescending(f => f.Created).Take(10);
+            dataGrid.ItemsSource = fileDatas.OrderByDescending(f => f.Created);
         }
 
-        public static BitmapImage toBitmap(Byte[] value)
+        public static BitmapImage toBitmap(string path)
         {
             try
             {
+                Byte[] value = File.ReadAllBytes(path);
                 if (value != null && value is byte[])
                 {
                     byte[] ByteArray = value as byte[];
                     BitmapImage bmp = new BitmapImage();
                     bmp.BeginInit();
                     bmp.StreamSource = new MemoryStream(ByteArray);
+                    bmp.DecodePixelWidth = 250;
                     bmp.EndInit();
                     return bmp;
                 }
@@ -117,13 +120,13 @@ namespace Wallpapers
             CommandManager.InvalidateRequerySuggested();
         }
 
-        private async void Run()
+        private void Run()
         {
-            await RunAsync();
+            SaveFiles();
             SetDataGrid();
         }
 
-        private async Task RunAsync()
+        private void SaveFiles()
         {
             string currentpath = Directory.GetCurrentDirectory();
             Config config = Config.Get();
