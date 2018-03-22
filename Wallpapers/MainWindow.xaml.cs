@@ -53,10 +53,10 @@ namespace Wallpapers
 
         private void SetDataGrid()
         {
-            string currentpath = Directory.GetCurrentDirectory();
+            string picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             Config config = Config.Get();
             List<FileData> fileDatas = new List<FileData>();
-            List<FileInfo> fileInfos = Directory.GetFiles($"{currentpath}\\{config.desktop}").Select(p => new FileInfo(p)).OrderByDescending(f => f.CreationTime).Take(10).ToList();
+            List<FileInfo> fileInfos = Directory.GetFiles($"{picturesPath}\\wallpapers_{config.desktop}").Select(p => new FileInfo(p)).OrderByDescending(f => f.CreationTime).Take(10).ToList();
 
             foreach (FileInfo file in fileInfos)
             {
@@ -127,7 +127,7 @@ namespace Wallpapers
 
         private void SaveFiles()
         {
-            string currentpath = Directory.GetCurrentDirectory();
+            string picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             Config config = Config.Get();
 
             WebClient client = new WebClient();
@@ -149,14 +149,14 @@ namespace Wallpapers
 
             foreach (string resolution in config.resolutions)
             {
-                if (!Directory.Exists($"{currentpath}\\{resolution}"))
+                if (!Directory.Exists($"{picturesPath}\\wallpapers_{resolution}"))
                 {
-                    Directory.CreateDirectory($"{currentpath}\\{resolution}");
+                    Directory.CreateDirectory($"{picturesPath}\\wallpapers_{resolution}");
                 }
-                List<string> files = Directory.GetFiles($"{currentpath}\\{resolution}").Select(s => s.Replace($"{currentpath}\\{resolution}\\", "").Split('_')[0]).ToList();
+                List<string> files = Directory.GetFiles($"{picturesPath}\\wallpapers_{resolution}").Select(s => s.Replace($"{picturesPath}\\wallpapers_{resolution}\\", "").Split('_')[0]).ToList();
 
-                SetLockScreenWallpapers(currentpath, resolution, files);
-                SetBingWallpapers(client, images, files, currentpath, resolution);
+                SetLockScreenWallpapers(picturesPath, resolution, files);
+                SetBingWallpapers(client, images, files, picturesPath, resolution);
             }
 
             if (!config.resolutions.Contains(config.desktop))
@@ -166,12 +166,12 @@ namespace Wallpapers
                 string resolution = config.resolutions.Where(r => int.Parse(r.Split('x')[0]) > width && int.Parse(r.Split('x')[1]) > height).OrderBy(r => r).FirstOrDefault();
                 if(!string.IsNullOrEmpty(resolution))
                 {
-                    if (!Directory.Exists($"{currentpath}\\{config.desktop}"))
+                    if (!Directory.Exists($"{picturesPath}\\wallpapers_{config.desktop}"))
                     {
-                        Directory.CreateDirectory($"{currentpath}\\{config.desktop}");
+                        Directory.CreateDirectory($"{picturesPath}\\wallpapers_{config.desktop}");
                     }
 
-                    List<string> files = Directory.GetFiles($"{currentpath}\\{resolution}").ToList();
+                    List<string> files = Directory.GetFiles($"{picturesPath}\\wallpapers_{resolution}").ToList();
                     foreach (string file in files)
                     {
                         string path = file.Replace(resolution, config.desktop);
@@ -187,7 +187,7 @@ namespace Wallpapers
             }
         }
 
-        private void SetLockScreenWallpapers(string currentpath, string resolution, List<string> files)
+        private void SetLockScreenWallpapers(string picturesPath, string resolution, List<string> files)
         {
             List<string> filesScreen = new List<string>();
             try
@@ -211,7 +211,7 @@ namespace Wallpapers
                         string name = nameArray[nameArray.Length - 1] + ".jpg";
                         if (!files.Contains(name))
                         {
-                            string path = $"{currentpath}\\{resolution}\\{name}";
+                            string path = $"{picturesPath}\\wallpapers_{resolution}\\{name}";
                             File.Copy(file, path);
                         }
                     }
@@ -236,7 +236,7 @@ namespace Wallpapers
             }
         }
 
-        private void SetBingWallpapers(WebClient client, List<Image> images, List<string> files, string currentpath, string resolution)
+        private void SetBingWallpapers(WebClient client, List<Image> images, List<string> files, string picturesPath, string resolution)
         {
             try
             {
@@ -245,7 +245,7 @@ namespace Wallpapers
                     string[] urlbaseArray = urlbase.Split('/');
                     string namebase = urlbaseArray[urlbaseArray.Length - 1];
                     string url = $"https://www.bing.com{urlbase}_{resolution}.jpg";
-                    string path = $"{currentpath}\\{resolution}\\{namebase}_{resolution}.jpg";
+                    string path = $"{picturesPath}\\wallpapers_{resolution}\\{namebase}_{resolution}.jpg";
                     string name = namebase.Split('_')[0];
                     if (!files.Contains(name))
                     {

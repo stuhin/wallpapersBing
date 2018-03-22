@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Web.Script.Serialization;
@@ -17,7 +18,13 @@ namespace Wallpapers
 
         public static Config Get()
         {
-            if (!File.Exists("config.json"))
+            Configuration configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal);
+            string path = configuration.FilePath.Substring(0, configuration.FilePath.IndexOf("Wallpapers") + 10);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            if (!File.Exists(path + "\\config.json"))
             {
                 Config config = new Config()
                 {
@@ -25,13 +32,13 @@ namespace Wallpapers
                     arhive_wallpapers = true,
                     lockscreen_to_wallpapers = true,
                     desktop = "1920x1080",
-                    resolutions = new string[] { "1920x1080", "1080x1920"},
+                    resolutions = new string[] { "1920x1080" },
                     cultures = new string[] { "en-US", "fr-FR", "de-DE", "ru-RU", "es-AR", "en-AU", "de-AT", "nl-BE", "fr-BE", "pt-BR", "en-CA", "fr-CA", "zh-HK", "en-IN", "en-ID", "it-IT", "ja-JP", "ko-KR", "en-MY", "es-MX", "nl-NL", "nb-NO", "zh-CN", "pl-PL", "ar-SA", "en-ZA", "es-ES", "sv-SE", "fr-CH", "de-CH", "zh-TW", "tr-TR", "en-GB", "es-US" }
                 };
                 string json = new JavaScriptSerializer().Serialize(config);
-                File.WriteAllText("config.json", json.Replace(",",",\r\n"));
+                File.WriteAllText(path + "\\config.json", json.Replace(",",",\r\n"));
             }
-            return new JavaScriptSerializer().Deserialize<Config>(File.ReadAllText("config.json"));
+            return new JavaScriptSerializer().Deserialize<Config>(File.ReadAllText(path + "\\config.json"));
         }
     }
 
