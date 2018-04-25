@@ -154,9 +154,9 @@ namespace Wallpapers
                     Directory.CreateDirectory($"{picturesPath}\\wallpapers_{resolution}");
                 }
                 List<string> files = Directory.GetFiles($"{picturesPath}\\wallpapers_{resolution}").Select(s => s.Replace($"{picturesPath}\\wallpapers_{resolution}\\", "").Split('_')[0]).ToList();
-
-                if (!isSave) isSave = SetLockScreenWallpapers(picturesPath, resolution, files);
-                if (!isSave) isSave = SetBingWallpapers(client, images, files, picturesPath, resolution);
+                bool setLook = SetLockScreenWallpapers(picturesPath, resolution, files);
+                bool setBing = SetBingWallpapers(client, images, files, picturesPath, resolution);
+                if (!isSave) isSave = setLook || setBing;
             }
 
             if (!config.resolutions.Contains(config.desktop))
