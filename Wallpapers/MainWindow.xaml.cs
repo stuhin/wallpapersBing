@@ -51,7 +51,7 @@ namespace Wallpapers
             Run();
         }
 
-        private void SetDataGrid()
+        private void SetDataGrid(bool issave)
         {
             string picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             Config config = Config.Get();
@@ -60,10 +60,10 @@ namespace Wallpapers
 
             foreach (FileInfo file in fileInfos)
             {
-                fileDatas.Add(new FileData() { Image = toBitmap(file.FullName), Path = file.FullName, Created = file.CreationTime });
+                fileDatas.Add(new FileData() { Image = GetBitmap(file.FullName), Path = file.FullName, Created = file.CreationTime });
             }
 
-            if (fileDatas.Count > 0)
+            if (issave && fileDatas.Count > 0)
             {
                 Wallpaper.Set(fileDatas.OrderByDescending(f => f.Created).First().Path);
             }
@@ -71,7 +71,7 @@ namespace Wallpapers
             dataGrid.ItemsSource = fileDatas.OrderByDescending(f => f.Created);
         }
 
-        public static BitmapImage toBitmap(string path)
+        private BitmapImage GetBitmap(string path)
         {
             try
             {
@@ -121,12 +121,14 @@ namespace Wallpapers
 
         private void Run()
         {
-            SaveFiles();
-            SetDataGrid();
+            bool isSave = SaveFiles();
+            SetDataGrid(isSave);
         }
 
-        private void SaveFiles()
+        private bool SaveFiles()
         {
+            bool isSave = false;
+
             string picturesPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             Config config = Config.Get();
 
@@ -137,13 +139,11 @@ namespace Wallpapers
             {
                 if (config.new_wallpapers)
                 {
-                    List<Image> images2 = GetBingWallpapers(client, culture, -1);
-                    images.AddRange(images2);
+                    images.AddRange(GetBingWallpapers(client, culture, -1));
                 }
                 if (config.arhive_wallpapers)
                 {
-                    List<Image> images2 = GetBingWallpapers(client, culture, 7);
-                    images.AddRange(images2);
+                    images.AddRange(GetBingWallpapers(client, culture, 7));
                 }
             }
 
@@ -155,8 +155,8 @@ namespace Wallpapers
                 }
                 List<string> files = Directory.GetFiles($"{picturesPath}\\wallpapers_{resolution}").Select(s => s.Replace($"{picturesPath}\\wallpapers_{resolution}\\", "").Split('_')[0]).ToList();
 
-                SetLockScreenWallpapers(picturesPath, resolution, files);
-                SetBingWallpapers(client, images, files, picturesPath, resolution);
+                if (!isSave) isSave = SetLockScreenWallpapers(picturesPath, resolution, files);
+                if (!isSave) isSave = SetBingWallpapers(client, images, files, picturesPath, resolution);
             }
 
             if (!config.resolutions.Contains(config.desktop))
@@ -185,10 +185,13 @@ namespace Wallpapers
                     }
                 }
             }
+
+            return isSave;
         }
 
-        private void SetLockScreenWallpapers(string picturesPath, string resolution, List<string> files)
+        private bool SetLockScreenWallpapers(string picturesPath, string resolution, List<string> files)
         {
+            bool isSave = false;
             List<string> filesScreen = new List<string>();
             try
             {
@@ -213,6 +216,7 @@ namespace Wallpapers
                         {
                             string path = $"{picturesPath}\\wallpapers_{resolution}\\{name}";
                             File.Copy(file, path);
+                            isSave = true;
                         }
                     }
                 }
@@ -221,7 +225,10 @@ namespace Wallpapers
 
                 }
             }
+
+            return isSave;
         }
+
         private List<Image> GetBingWallpapers(WebClient client, string culture, int idx)
         {
             try
@@ -236,8 +243,9 @@ namespace Wallpapers
             }
         }
 
-        private void SetBingWallpapers(WebClient client, List<Image> images, List<string> files, string picturesPath, string resolution)
+        private bool SetBingWallpapers(WebClient client, List<Image> images, List<string> files, string picturesPath, string resolution)
         {
+            bool isSave = false;
             try
             {
                 foreach (string urlbase in images.Select(i => i.urlbase).Distinct())
@@ -251,6 +259,7 @@ namespace Wallpapers
                     {
                         client.DownloadFile(url, path);
                         files.Add(name);
+                        isSave = true;
                     }
                 }
             }
@@ -258,6 +267,7 @@ namespace Wallpapers
             {
 
             }
+            return isSave;
         }
 
         public static System.Drawing.Image Crop(System.Drawing.Image image, Rectangle selection)
