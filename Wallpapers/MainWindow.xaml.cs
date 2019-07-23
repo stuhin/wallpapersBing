@@ -250,7 +250,7 @@ namespace Wallpapers
             {
                 foreach (string urlbase in images.Select(i => i.urlbase).Distinct())
                 {
-                    string[] urlbaseArray = urlbase.Split('/');
+                    string[] urlbaseArray = urlbase.Split(new char[] { '/', '=', '?' });
                     string namebase = urlbaseArray[urlbaseArray.Length - 1];
                     string url = $"https://www.bing.com{urlbase}_{resolution}.jpg";
                     string path = $"{picturesPath}\\wallpapers_{resolution}\\{namebase}_{resolution}.jpg";
