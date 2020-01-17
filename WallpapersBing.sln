@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wallpapers", "Wallpapers\Wallpapers.csproj", "{1A2B6DFC-B965-4F01-AAF6-60EB80D79BCD}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "SetupWallpapers", "SetupWallpapers\SetupWallpapers.vdproj", "{D5A2A777-35C5-4CDA-B3B0-FA6C18044EC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,8 +15,6 @@ Global
 		{1A2B6DFC-B965-4F01-AAF6-60EB80D79BCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A2B6DFC-B965-4F01-AAF6-60EB80D79BCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A2B6DFC-B965-4F01-AAF6-60EB80D79BCD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5A2A777-35C5-4CDA-B3B0-FA6C18044EC2}.Debug|Any CPU.ActiveCfg = Debug
-		{D5A2A777-35C5-4CDA-B3B0-FA6C18044EC2}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
